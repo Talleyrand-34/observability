@@ -1,0 +1,31 @@
+include:
+  - ./compose-minio.yml
+  - ./compose-memcached.yml
+services:
+  mimir:
+    image: grafana/mimir-alpine:${MIMIR_VERSION:-latest}
+    volumes:
+      - ${PWD}/config/mimir:/etc/mimir
+    depends_on:
+      minio:
+        condition: service_healthy
+    env_file:
+      - .env
+    command:
+      - -config.file=/etc/mimir/monolithic-mode-metrics.yaml
+      - -target=all
+      - -config.expand-env=true
+      - -validation.max-length-label-value=4096000
+      # https://grafana.com/docs/mimir/latest/configure/about-versioning/
+      - -alertmanager.grafana-alertmanager-compatibility-enabled
+      - -alertmanager.utf8-strict-mode-enabled
+    healthcheck:
+      test: [ "CMD", "/usr/bin/wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      proxy-network:
+      observability:
+        aliases:
+          - mimir-memberlist

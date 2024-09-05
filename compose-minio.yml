@@ -1,0 +1,24 @@
+services:
+  minio:
+    image: minio/minio:${MINIO_VERSION:-latest}
+    # https://github.com/qclaogui/codelab-monitoring/blob/main/docker-compose/common/config/agent-flow/modules/docker/README.md
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /data/mimir-blocks /data/mimir-ruler /data/mimir-alertmanager && \
+        mkdir -p /data/loki-data /data/loki-ruler && \
+        mkdir -p /data/tempo-data  && \
+        mkdir -p /data/pyroscope-data && \
+        minio server /data --console-address ':9001'
+    env_file:
+      - .env
+    volumes:
+      - ${PWD}/minio:/data
+    healthcheck:
+      test: ["CMD-SHELL", "mc ready local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - observability

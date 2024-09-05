@@ -1,0 +1,11 @@
+name: observability
+include:
+  - ./compose-mimir.yml
+#  - ./compose-loki.yml
+
+networks:
+  proxy-network:
+    name: services
+    external: true
+  observability:
+    name: observability

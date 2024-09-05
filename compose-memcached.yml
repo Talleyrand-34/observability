@@ -1,0 +1,7 @@
+services:
+  memcached:
+    labels:
+      - metrics.agent.grafana.com/scrape=false
+    image: memcached:${MEMCACHED_VERSION:-latest}
+    networks:
+      observability:

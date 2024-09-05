@@ -1,0 +1,30 @@
+name: i40sys_observability
+include:
+  - ./compose-minio.yml
+  - ./compose-memcached.yml
+services:
+  loki:
+    labels:
+      - logs.agent.grafana.com/log-format=json
+    depends_on:
+      minio:
+        condition: service_healthy
+    image: grafana/loki:${LOKI_VERSION:-latest}
+    volumes:
+      - ${PWD}/config/loki:/etc/loki
+    command:
+      - -config.file=/etc/loki/monolithic-mode-logs.yaml
+      - -target=all
+      - -config.expand-env=true
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/ready || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      proxy-network:
+      observability:
+        aliases:
+          - loki-memberlist
