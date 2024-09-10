@@ -11,6 +11,8 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    ports:
+      - "10.2.0.134:3080:80"
     command:
       - -config.file=/etc/mimir/monolithic-mode-metrics.yaml
       - -target=all

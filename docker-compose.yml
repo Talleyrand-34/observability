@@ -1,7 +1,7 @@
 name: observability
 include:
   - ./compose-mimir.yml
-  - ./compose-loki.yml
+  #- ./compose-loki.yml
 
 networks:
   proxy-network:
