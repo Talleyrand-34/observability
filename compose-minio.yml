@@ -16,7 +16,8 @@ services:
     volumes:
       - ${PWD}/minio:/data
     healthcheck:
-      test: ["CMD-SHELL", "mc ready local"]
+      # test: ["CMD-SHELL", "mc ready local"]
+      test: ["CMD", "mc", "ready", "local"]
       interval: 5s
       timeout: 5s
       retries: 5
