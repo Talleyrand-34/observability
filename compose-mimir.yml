@@ -13,6 +13,8 @@ services:
       - .env
     ports:
       - "3080:80"
+    expose:
+      - "3080"
     command:
       - -config.file=/etc/mimir/monolithic-mode-metrics.yaml
       - -target=all

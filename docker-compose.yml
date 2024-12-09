@@ -2,6 +2,8 @@ name: observability
 include:
   - ./compose-mimir.yml
   - ./compose-loki.yml
+  - ./compose-alloy.yml
+  - ./compose-grafana.yml
 
 networks:
   proxy-network:

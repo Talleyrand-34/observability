@@ -1,0 +1,35 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+prometheus.exporter.self "alloy" {}
+
+prometheus.scrape "alloy" {
+	targets    = prometheus.exporter.self.alloy.targets
+	forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+	endpoint {
+	  // TODO: modify destiny ip
+    url = "http://192.168.30.129:3080/api/v1/push"
+	}
+}
+
+local.file_match "local_files"{
+  path_targets = [{"__path__" = "/log/*"}]
+  sync_period = "5s"
+}
+loki.source.file "log_scrape" {
+  targets = local.file_match.local_files.targets
+  forward_to = [loki.write.endpoint.receiver]
+  tail_from_end = true
+}
+
+loki.write "endpoint" {
+    endpoint {
+	  // TODO: modify destiny ip
+        url = "http://192.168.30.129:3081/loki/api/v1/push"
+    }
+}

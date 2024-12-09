@@ -1,0 +1,39 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+prometheus.exporter.self "alloy" {}
+
+prometheus.scrape "alloy" {
+	targets    = prometheus.exporter.self.alloy.targets
+	forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+	endpoint {
+    url = "http://10.2.0.134:3080/api/v1/push"
+	}
+}
+
+
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+}
+
+loki.source.journal "read"  {
+  forward_to    = [loki.write.endpoint.receiver]
+  relabel_rules = loki.relabel.journal.rules
+  labels        = {component = "loki.source.journal"}
+}
+
+loki.write "endpoint" {
+  endpoint {
+    url = "http://10.2.0.134:3081/loki/api/v1/push"
+  }
+}
