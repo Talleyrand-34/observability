@@ -10,6 +10,7 @@ prometheus.scrape "alloy" {
 	forward_to = [prometheus.remote_write.mimir.receiver]
 }
 
+#TODO Modify IP
 prometheus.remote_write "mimir" {
 	endpoint {
     url = "http://192.168.30.129:3080/api/v1/push"
@@ -33,6 +34,7 @@ loki.relabel "system" {
     }
 }
 
+#TODO Modify IP
 loki.write "endpoint" {
     endpoint {
         url = "http://10.2.0.134:3081/loki/api/v1/push"
