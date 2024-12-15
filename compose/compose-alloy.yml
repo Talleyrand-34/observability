@@ -1,0 +1,21 @@
+services:
+  alloy:
+    image: grafana/alloy:latest
+    volumes:
+      - ./config/alloy/config.alloy:/etc/alloy/config.alloy
+      - /var/log:/log
+    ports:
+      - "12345:12345"
+    #expose:
+    #  - "12345"
+    command: >
+      run 
+      --server.http.listen-addr=0.0.0.0:12345 
+      --storage.path=/var/lib/alloy/data 
+      /etc/alloy/config.alloy
+
+    networks:
+      proxy-network:
+      observability:
+        aliases:
+          - alloy-memberlist

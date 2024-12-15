@@ -1,0 +1,49 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+prometheus.exporter.self "alloy" {}
+
+prometheus.scrape "alloy" {
+	targets    = prometheus.exporter.self.alloy.targets
+	forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+	endpoint {
+    url = "http://192.168.30.129:3080/api/v1/push"
+	}
+}
+// Replace journal with file-based log collection
+//loki.source.file "system_logs" {
+//    targets = [
+//        {__path__ = "/var/log/messages", filename = "/var/log/messages"},
+//        {__path__ = "/var/log/syslog", filename = "/var/log/syslog"}
+//    ]
+//    forward_to = [loki.relabel.system.receiver]
+//}
+//
+//loki.relabel "system" {
+//    forward_to = [loki.write.endpoint.receiver]
+//
+//    rule {
+//        source_labels = ["filename"]
+//        target_label  = "log_file"
+//    }
+//}
+local.file_match "local_files"{
+  path_targets = [{"__path__" = "/log/*"}]
+  sync_period = "5s"
+}
+loki.source.file "log_scrape" {
+  targets = local.file_match.local_files.targets
+  forward_to = [loki.write.endpoint.receiver]
+  tail_from_end = true
+}
+
+loki.write "endpoint" {
+    endpoint {
+        url = "http://192.168.30.129:3081/loki/api/v1/push"
+    }
+}

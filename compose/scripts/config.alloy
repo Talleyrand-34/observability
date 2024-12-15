@@ -12,7 +12,7 @@ prometheus.scrape "alloy" {
 
 prometheus.remote_write "mimir" {
 	endpoint {
-    url = "http://10.2.0.134:3080/api/v1/push"
+    url = "http://192.168.30.129:3080/api/v1/push"
 	}
 }
 
@@ -34,6 +34,6 @@ loki.source.journal "read"  {
 
 loki.write "endpoint" {
   endpoint {
-    url = "http://10.2.0.134:3081/loki/api/v1/push"
+    url = "http://192.168.30.129:3081/loki/api/v1/push"
   }
 }
